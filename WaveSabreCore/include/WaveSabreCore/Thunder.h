@@ -1,3 +1,5 @@
+// vim: set noet:
+
 #ifndef __WAVESABRECORE_THUNDER_H__
 #define __WAVESABRECORE_THUNDER_H__
 
@@ -24,9 +26,12 @@ namespace WaveSabreCore
 		virtual void SetChunk(void *data, int size);
 		virtual int GetChunk(void **data);
 
-		void LoadSample(char *data, int compressedSize, int uncompressedSize, WAVEFORMATEX *waveFormat);
+		void LoadSample(char *data, int compressedSize, int uncompressedSize,
+			AudioFormat* waveFormat);
 
 	private:
+		ISampleDecoder* decoder;
+
 		class ThunderVoice : public Voice
 		{
 		public:
@@ -42,21 +47,6 @@ namespace WaveSabreCore
 
 			int samplePos;
 		};
-
-		static BOOL __stdcall driverEnumCallback(HACMDRIVERID driverId, DWORD dwInstance, DWORD fdwSupport);
-		static BOOL __stdcall formatEnumCallback(HACMDRIVERID driverId, LPACMFORMATDETAILS formatDetails, DWORD dwInstance, DWORD fdwSupport);
-
-		static HACMDRIVERID driverId;
-
-		char *chunkData;
-
-		char *waveFormatData;
-		int compressedSize, uncompressedSize;
-
-		char *compressedData;
-		float *sampleData;
-
-		int sampleLength;
 	};
 }
 

@@ -1,11 +1,22 @@
+// vim: set noet:
+
 #include <WaveSabreCore/Helpers.h>
 
 #include <inttypes.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-static __declspec(naked) double __vectorcall fpuPow(double x, double y)
+#ifdef _MSC_VER
+#define ASMVECTORCODE __declspec(naked) __vectorcall
+#else
+#define ASMVECTORCODE inline __attribute__((__always_inline__ \
+    /*__naked__, __sseregparm__*/)) \
+
+#endif
+
+static ASMVECTORCODE double fpuPow(double x, double y)
 {
+#ifdef _MSC_VER
 	__asm
 	{
 		sub esp, 8
@@ -50,10 +61,14 @@ done:
 
 		ret
 	}
+#else /* GCC/Clang */
+	__builtin_pow(x, y); // :D
+#endif /* MSVC vs GCC/Clang */
 }
 
-static __declspec(naked) float __vectorcall fpuPowF(float x, float y)
+static ASMVECTORCODE float fpuPowF(float x, float y)
 {
+#ifdef _MSC_VER
 	__asm
 	{
 		sub esp, 8
@@ -98,10 +113,14 @@ done:
 
 		ret
 	}
+#else /* GCC/Clang */
+	__builtin_powf(x, y); // :D
+#endif /* MSVC vs GCC/Clang */
 }
 
-static __declspec(naked) double __vectorcall fpuCos(double x)
+static ASMVECTORCODE double fpuCos(double x)
 {
+#ifdef _MSC_VER
 	__asm
 	{
 		sub esp, 8
@@ -116,6 +135,9 @@ static __declspec(naked) double __vectorcall fpuCos(double x)
 
 		ret
 	}
+#else /* GCC/Clang */
+	__builtin_cos(x);
+#endif /* MSVC vs GCC/Clang */
 }
 
 namespace WaveSabreCore
@@ -350,7 +372,7 @@ namespace WaveSabreCore
 	{
 		return (Spread)(int)(param * 2.0f);
 	}
-	
+
 	float Helpers::SpreadToParam(Spread spread)
 	{
 		return (float)spread / 2.0f;
